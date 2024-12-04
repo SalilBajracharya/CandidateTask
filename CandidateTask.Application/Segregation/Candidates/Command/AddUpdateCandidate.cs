@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 using CandidateTask.Application.Common.Interface;
 using CandidateTask.Data.Entities;
 using MediatR;

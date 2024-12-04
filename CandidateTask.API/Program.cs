@@ -1,3 +1,4 @@
+using CandidateTask.API.Filters;
 using CandidateTask.Application;
 using CandidateTask.Infrastructure;
 using CandidateTask.Infrastructure.Persistence;
@@ -7,13 +8,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices();
+
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<CustomExceptionHandlerFilters>();
+});
 
 var app = builder.Build();
 
@@ -44,5 +50,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseDeveloperExceptionPage();
 
 app.Run();
