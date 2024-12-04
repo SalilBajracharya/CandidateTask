@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using CandidateTask.Application.Common.Interface;
+using CandidateTask.Data.Entities;
 using MediatR;
 
-namespace CandidateTask.Application.Segregation.Candidate.Command
+namespace CandidateTask.Application.Segregation.Candidates.Command
 {
     public record AddUpdateCandidate : IRequest<Unit>
     {
@@ -27,6 +28,9 @@ namespace CandidateTask.Application.Segregation.Candidate.Command
 
         public async Task<Unit> Handle(AddUpdateCandidate request, CancellationToken cancellationToken)
         {
+            var mappedCandidate = _mapper.Map<Candidate>(request);
+            await _ctx.Candidates.AddAsync(mappedCandidate);
+            await _ctx.SaveChangesAsync(cancellationToken);
             return Unit.Value;
         }
     }

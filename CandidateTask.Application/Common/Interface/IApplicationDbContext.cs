@@ -6,5 +6,8 @@ namespace CandidateTask.Application.Common.Interface
     public interface IApplicationDbContext
     {
         public DbSet<Candidate> Candidates { get; }
+
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+
     }
 }

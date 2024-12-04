@@ -7,16 +7,18 @@ namespace CandidateTask.Infrastructure.Persistence
 {
     public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
-        private readonly IMediator _mediator;
-
+        public ApplicationDbContext() { }
         public ApplicationDbContext(
-            DbContextOptions<ApplicationDbContext> options,
-            IMediator mediator
+            DbContextOptions<ApplicationDbContext> options
             ) : base(options) 
         {
-            _mediator = mediator;    
         }
 
         public DbSet<Candidate> Candidates => Set<Candidate>();
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return await base.SaveChangesAsync(cancellationToken);
+        }
     }
 }

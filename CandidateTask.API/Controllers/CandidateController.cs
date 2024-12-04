@@ -1,4 +1,4 @@
-﻿using CandidateTask.Application.Segregation.Candidate.Command;
+﻿using CandidateTask.Application.Segregation.Candidates.Command;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
