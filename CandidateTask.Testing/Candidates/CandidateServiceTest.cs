@@ -2,8 +2,9 @@
 using CandidateTask.Application.Common.Interface;
 using CandidateTask.Application.Segregation.Candidates.Command;
 using CandidateTask.Data.Entities;
-using CandidateTask.Infrastructure.Services;
+using CandidateTask.Infrastructure.Services.Candidates;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace CandidateTask.Testing.Candidates
@@ -13,12 +14,17 @@ namespace CandidateTask.Testing.Candidates
         private readonly Mock<IApplicationDbContext> _mockCtx;
         private readonly Mock<IMapper> _mockMapper;
         private readonly CandidateService _candidateService;
+        private readonly Mock<ILogger<CandidateService>> _mockLogger;  // Mock ILogger
 
         public CandidateServiceTest()
         {
             _mockCtx = new Mock<IApplicationDbContext>();
             _mockMapper = new Mock<IMapper>();
-            _candidateService = new CandidateService(_mockCtx.Object);
+
+            _mockLogger = new Mock<ILogger<CandidateService>>(); // Initialize the logger mock
+
+
+            _candidateService = new CandidateService(_mockCtx.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -76,7 +82,7 @@ namespace CandidateTask.Testing.Candidates
                     dest.LastName = src.LastName;
                     dest.Comment = src.Comment;
                 });
-           
+
             _mockCtx.Setup(c => c.Candidates.Update(existingCandidate)).Verifiable();
             _mockCtx.Setup(c => c.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 

@@ -5,6 +5,7 @@ using CandidateTask.Application.Common.Interface.Candidates;
 using CandidateTask.Data.Entities;
 using FluentResults;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace CandidateTask.Application.Segregation.Candidates.Command
 {
@@ -15,6 +16,7 @@ namespace CandidateTask.Application.Segregation.Candidates.Command
         [Required]
         public string LastName { get; set; }
         public string Phone { get; set; }
+        public string CallbackWindow { get; set; }
         [Required]
         [EmailAddress]
         public required string Email { get; set; }

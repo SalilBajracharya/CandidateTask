@@ -10,7 +10,8 @@ namespace CandidateTask.Data.Entities
         public required string FirstName { get; set; }
         [Required]
         public required string LastName { get; set; }
-        public string? Phone { get; set; }
+        public string? Phone { get; set; } 
+        public string? CallbackWindow { get; set; }
         [Required]
         public required string Email { get; set; }
         public string? LinkedInURL { get; set; }
