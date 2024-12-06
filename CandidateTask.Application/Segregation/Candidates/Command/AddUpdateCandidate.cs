@@ -5,7 +5,6 @@ using CandidateTask.Application.Common.Interface.Candidates;
 using CandidateTask.Data.Entities;
 using FluentResults;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace CandidateTask.Application.Segregation.Candidates.Command
 {
@@ -46,19 +45,16 @@ namespace CandidateTask.Application.Segregation.Candidates.Command
             if (existingCandidate is not null)
             {
                 _mapper.Map(request, existingCandidate);
-                await _ctx.SaveChangesAsync(cancellationToken);
+                await _candidateService.Update(existingCandidate, cancellationToken);
                 return Result.Ok().WithSuccess("Candidate updated successfully.");
             }
             else
             {
                 //if email is new create new entity
                 var newCandidate = _mapper.Map<Candidate>(request);
-                await _ctx.Candidates.AddAsync(newCandidate);
-                await _ctx.SaveChangesAsync(cancellationToken);
+                await _candidateService.Add(newCandidate, cancellationToken);
                 return Result.Ok().WithSuccess("Candidate added successfully.");
             }
-           
-                            
         }
     }
 }

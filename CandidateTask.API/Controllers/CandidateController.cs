@@ -12,7 +12,7 @@ namespace CandidateTask.API.Controllers
         public async Task<ActionResult<Result>> AddUpdateCandidate([FromBody] AddUpdateCandidate command)
         {
             var result = await Mediator.Send(command);
-            return Ok(result.Successes.FirstOrDefault().Message);
+            return Ok(result.Successes);
         }
     }
 }
