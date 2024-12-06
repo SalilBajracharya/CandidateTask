@@ -1,5 +1,6 @@
 ﻿using CandidateTask.Application.Segregation.Candidates.Command;
-using MediatR;
+using FluentResults;
+using FluentResults.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CandidateTask.API.Controllers
@@ -8,9 +9,10 @@ namespace CandidateTask.API.Controllers
     public class CandidateController : CustomApiControllerBase
     {
         [HttpPost]
-        public async Task<ActionResult<Unit>> AddUpdateCandidate([FromBody] AddUpdateCandidate command)
+        public async Task<ActionResult<Result>> AddUpdateCandidate([FromBody] AddUpdateCandidate command)
         {
-            return await Mediator.Send(command);
+            var result = await Mediator.Send(command);
+            return Ok(result.Successes.FirstOrDefault().Message);
         }
     }
 }

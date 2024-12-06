@@ -1,5 +1,4 @@
-﻿using CandidateTask.Application.Common.Exceptions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace CandidateTask.API.Filters
@@ -13,7 +12,7 @@ namespace CandidateTask.API.Filters
             //Register custom exception handlers
             _exceptionHandlers = new Dictionary<Type, Action<ExceptionContext>>
             {
-                { typeof(CustomValidationException), HandleValidationException }
+                
             };
         }
 
@@ -26,15 +25,9 @@ namespace CandidateTask.API.Filters
         private void HandleException(ExceptionContext context)
         {
             Type type = context.Exception.GetType();
-            if (_exceptionHandlers.ContainsKey(type))
+            if (_exceptionHandlers.TryGetValue(type, out Action<ExceptionContext> value))
             {
-                _exceptionHandlers[type].Invoke(context);
-                return;
-            }
-
-            if (!context.ModelState.IsValid)
-            {
-                HandleInvalidModelStateException(context);
+                value.Invoke(context);
                 return;
             }
 
@@ -51,35 +44,6 @@ namespace CandidateTask.API.Filters
             {
                 StatusCode = StatusCodes.Status500InternalServerError
             };
-
-            context.ExceptionHandled = true;
-        }
-
-
-
-        private void HandleValidationException(ExceptionContext context)
-        {
-            var exception = (CustomValidationException)context.Exception;
-
-            var details = new ValidationProblemDetails(exception.Errors)
-            {
-                Title = "Validation Exception.",
-            };
-
-            context.Result = new BadRequestObjectResult(details);
-
-            context.ExceptionHandled = true;
-        }
-
-        private void HandleInvalidModelStateException(ExceptionContext context)
-        {
-            var details = new ValidationProblemDetails(context.ModelState)
-            {
-                Title = "Invalid Model Exception.",
-                Detail = context.Exception.Message
-            };
-
-            context.Result = new BadRequestObjectResult(details);
 
             context.ExceptionHandled = true;
         }
