@@ -9,8 +9,6 @@ using NLog.Web;
 var builder = WebApplication.CreateBuilder(args);
 
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
-logger.Error("init main");
-
 try
 {
     builder.Logging.ClearProviders();

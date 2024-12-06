@@ -6,6 +6,12 @@ namespace CandidateTask.API.Filters
 {
     public class ModelStateFilter : IAsyncActionFilter
     {
+        private readonly ILogger<ModelStateFilter> _logger;
+
+        public ModelStateFilter(ILogger<ModelStateFilter> logger) { 
+            _logger = logger;
+        }
+
         public async Task OnActionExecutionAsync(
             ActionExecutingContext context,
             ActionExecutionDelegate next
@@ -20,6 +26,13 @@ namespace CandidateTask.API.Filters
                         Property = e.Key,
                         Errors = e.Value.Errors.Select(me => me.ErrorMessage),
                     });
+
+                // Log the validation errors
+                foreach (var error in validationErrors)
+                {
+                    _logger.LogError("Validation error in property '{Property}': {Errors}",
+                        error.Property, string.Join(", ", error.Errors));
+                }
 
                 var problemDetails = new ProblemDetails
                 {

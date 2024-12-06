@@ -6,14 +6,15 @@ namespace CandidateTask.API.Filters
     public class CustomExceptionHandlerFilters : ExceptionFilterAttribute
     {
         private readonly IDictionary<Type, Action<ExceptionContext>> _exceptionHandlers;
-
-        public CustomExceptionHandlerFilters()
+        private readonly ILogger<CustomExceptionHandlerFilters> _logger;
+        public CustomExceptionHandlerFilters(ILogger<CustomExceptionHandlerFilters> logger)
         {
             //Register custom exception handlers
             _exceptionHandlers = new Dictionary<Type, Action<ExceptionContext>>
             {
-                
+
             };
+            _logger = logger;
         }
 
         public override void OnException(ExceptionContext context)
@@ -39,6 +40,8 @@ namespace CandidateTask.API.Filters
                 Type = "Server Error",
                 Detail = "Contact the Service Provider"
             };
+
+            _logger.LogError(context.Exception.Message);
 
             context.Result = new ObjectResult(details)
             {
