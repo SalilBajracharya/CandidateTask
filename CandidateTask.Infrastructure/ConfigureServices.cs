@@ -1,5 +1,7 @@
 ﻿using CandidateTask.Application.Common.Interface;
+using CandidateTask.Application.Common.Interface.Candidates;
 using CandidateTask.Infrastructure.Persistence;
+using CandidateTask.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +24,8 @@ namespace CandidateTask.Infrastructure
                 provider => provider.GetRequiredService<ApplicationDbContext>()
             );
 
+
+            services.AddTransient<ICandidateService, CandidateService>();
             return services;
         }
     }

@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using CandidateTask.Application.Common.Interface;
+using CandidateTask.Application.Common.Interface.Candidates;
 using CandidateTask.Data.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace CandidateTask.Application.Segregation.Candidates.Command
 {
@@ -21,17 +23,33 @@ namespace CandidateTask.Application.Segregation.Candidates.Command
     {
         private readonly IApplicationDbContext _ctx;
         private readonly IMapper _mapper;
-        public AddUpdateCandidationHandler(IApplicationDbContext ctx, IMapper mapper)
+        private readonly ICandidateService _candidateService;
+        public AddUpdateCandidationHandler(IApplicationDbContext ctx, IMapper mapper, ICandidateService candidateService)
         {
             _ctx = ctx;
             _mapper = mapper;
+            _candidateService = candidateService;
         }
 
         public async Task<Unit> Handle(AddUpdateCandidate request, CancellationToken cancellationToken)
         {
-            var mappedCandidate = _mapper.Map<Candidate>(request);
-            await _ctx.Candidates.AddAsync(mappedCandidate);
+            //check if email exists
+            var existingCandidate = await _ctx.Candidates
+                .FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
+
+            //if email exists update
+            if (existingCandidate is not null)
+            {
+                _mapper.Map(request, existingCandidate);
+            }
+            else
+            {
+                //if email is new create new entity
+                var newCandidate = _mapper.Map<Candidate>(request);
+                await _ctx.Candidates.AddAsync(newCandidate);
+            }
             await _ctx.SaveChangesAsync(cancellationToken);
+
             return Unit.Value;
         }
     }
