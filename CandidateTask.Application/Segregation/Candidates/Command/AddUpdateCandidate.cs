@@ -3,23 +3,29 @@ using AutoMapper;
 using CandidateTask.Application.Common.Interface;
 using CandidateTask.Application.Common.Interface.Candidates;
 using CandidateTask.Data.Entities;
+using FluentResults;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace CandidateTask.Application.Segregation.Candidates.Command
 {
-    public record AddUpdateCandidate : IRequest<Unit>
+    public record AddUpdateCandidate : IRequest<Result>
     {
-        public required string FirstName { get; set; }
-        public required string LastName { get; set; }
-        public string? Phone { get; set; }
+        [Required]
+        public string FirstName { get; set; }
+        [Required]
+        public string LastName { get; set; }
+        public string Phone { get; set; }
+        [Required]
+        [EmailAddress]
         public required string Email { get; set; }
-        public string? LinkedInURL { get; set; }
-        public string? GitURL { get; set; }
-        public required string Comment { get; set; }
+        public string LinkedInURL { get; set; }
+        public string GitURL { get; set; }
+        [Required]
+        public string Comment { get; set; }
     }
 
-    public class AddUpdateCandidationHandler : IRequestHandler<AddUpdateCandidate, Unit>
+    public class AddUpdateCandidationHandler : IRequestHandler<AddUpdateCandidate, Result>
     {
         private readonly IApplicationDbContext _ctx;
         private readonly IMapper _mapper;
@@ -31,26 +37,28 @@ namespace CandidateTask.Application.Segregation.Candidates.Command
             _candidateService = candidateService;
         }
 
-        public async Task<Unit> Handle(AddUpdateCandidate request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(AddUpdateCandidate request, CancellationToken cancellationToken)
         {
             //check if email exists
-            var existingCandidate = await _ctx.Candidates
-                .FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
+            var existingCandidate = await _candidateService.GetByEmail(request.Email);
 
             //if email exists update
             if (existingCandidate is not null)
             {
                 _mapper.Map(request, existingCandidate);
+                await _ctx.SaveChangesAsync(cancellationToken);
+                return Result.Ok().WithSuccess("Candidate updated successfully.");
             }
             else
             {
                 //if email is new create new entity
                 var newCandidate = _mapper.Map<Candidate>(request);
                 await _ctx.Candidates.AddAsync(newCandidate);
+                await _ctx.SaveChangesAsync(cancellationToken);
+                return Result.Ok().WithSuccess("Candidate added successfully.");
             }
-            await _ctx.SaveChangesAsync(cancellationToken);
-
-            return Unit.Value;
+           
+                            
         }
     }
 }
